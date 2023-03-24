@@ -1,0 +1,1 @@
+declare module '@eluvio/mock-fabric';
