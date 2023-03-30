@@ -1,0 +1,130 @@
+{
+  "dump_stack_on_exit": false,
+  "paths": {
+    "install_path": "./RUN",
+    "config_path": "./RUN/config",
+    "qparts_path": "./RUN/QDATA/PARTS",
+    "qtemp_path": "./RUN/QDATA/TEMP",
+    "qlibs_path": "./RUN/QDATA/LIBS",
+    "node_path": "./RUN/QDATA/LOCAL",
+    "cache_path": "./RUN/QDATA/CACHE",
+    "search_index_path": "./RUN/QDATA/SEARCH"
+  },
+  "api": {
+    "base_url": "http://localhost:8008",
+    "auth_bypass": {
+      "username": "demo"
+    },
+    "cors": {
+      "allowed_origins": [
+        "*"
+      ],
+      "allowed_methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+      ],
+      "allowed_headers": [
+        "*"
+      ],
+      "max_age": 600,
+      "debug": false
+    },
+    "log_body_max": "64KB"
+  },
+  "log": {
+    "level": "debug",
+    "formatter": "text",
+    "file": {
+      "filename": "./qfab.log",
+      "maxsize": 10,
+      "maxage": 0,
+      "maxbackups": 2
+    }
+  },
+  "llvm": {
+    "execution_engine_cache": {
+      "enabled": true,
+      "size": 20
+    },
+    "port_range": "7000:7100"
+  },
+  "wapc": {
+    "execution_engine_cache": {
+      "enabled": true,
+      "size": 20
+    },
+    "port_range": "7101:7200",
+    "is_debug":true
+  },
+  "avpipe" : {
+    "drm_required": false,
+    "persistent" : "none",
+    "debug_frame_level" : false,
+    "cache" : {
+      "path" : "leveldb",
+      "audio_page_segments": 2000,
+      "video_page_segments": 1500,
+      "manifests": 1000,
+      "metas": 3000,
+      "abr_infos": 3000,
+      "captions": 2000
+    }
+  },
+  "search": {
+    "sweepinterval" : "10m",
+    "sweepstale" : "10m",
+    "container_archive_path" : "../../../search-container.tar",
+    "unix_socket_location": "/var/snap/lxd/common/lxd/unix.socket"
+  },
+  "crawl": {
+    "container_archive_path" : "../../../search-container.tar",
+    "unix_socket_location": "/var/snap/lxd/common/lxd/unix.socket"
+  },
+  "metrics": {
+    "type": "expvar"
+  },
+  "fabric" : {
+    "node_id": "inod000000000000"
+  },
+  "qspaces": [
+    {
+      "id": "ispc000000000000",
+      "type": "Ethereum",
+      "names" : ["dev", "main"],
+      "ethereum" : {
+	"url":"http://localhost:8545",
+	"network_id":955101,
+	"wallet_file" : "./RUN/config/wallet.json",
+	"dao" : {
+          "enabled": true,
+          "interval": "1s"
+        }
+      }
+    },
+    {
+      "id": "ispcMockFs",
+      "type": "Mock",
+      "mock": {}
+    },
+    {
+      "id": "ispcMockEtcd",
+      "type": "Mock",
+      "mock": {},
+      "fabric_store": {
+        "etcd": {
+          "enabled": true,
+          "request_timeout": "5s",
+          "endpoints": [
+            "localhost:2379"
+          ]
+        }
+      }
+    }
+  ],
+  "gc": {
+    "interval": "1m"
+  }
+}

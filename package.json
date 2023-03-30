@@ -60,6 +60,14 @@
         "title": "node view item"
       },
       {
+        "command": "executeFabric",
+        "title": "Execute content fabric"
+      },
+      {
+        "command": "installFabric",
+        "title": "Install content fabric"
+      },
+      {
         "command": "node_id.refresh",
         "title": "refresh",
         "icon": {
@@ -105,7 +113,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@eluvio/elv-client-js": "^4.0.22",
-    "@eluvio/mock-fabric": "file:../mock-fabric"
+    "@eluvio/elv-client-js": "file:../elv-client-js",
+    "xhr2": "^0.2.1"
   }
 }

@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import {ElvClient} from '@eluvio/elv-client-js';
+import { FabricRunner } from './fabric_runner';
+
 
 export namespace elv_tree
 {
@@ -33,7 +35,7 @@ export namespace elv_tree
     {
         private data : NetWorkView [] = [];
         private elvData = ElvClient;
-        private configData = {};
+        private fr:FabricRunner;
    
         private mOnDidChangeTreeData: vscode.EventEmitter<NetWorkView | undefined> = new vscode.EventEmitter<NetWorkView | undefined>();
 
@@ -41,11 +43,11 @@ export namespace elv_tree
         readonly onDidChangeTreeData ? : vscode.Event<NetWorkView | undefined> = this.mOnDidChangeTreeData.event;
 
         // we register two commands for vscode, item clicked (we'll implement later) and the refresh button. 
-        public constructor(localData:Object)  {
-            this.configData = localData;
+        public constructor(fr:FabricRunner)  {
+            this.fr = fr;
 
             vscode.commands.registerCommand('debug_id.item_clicked', r => this.onItemClicked(r));
-            vscode.commands.registerCommand('debug_id.refresh', () => this.refresh());
+            vscode.commands.registerCommand('debug_id.refresh', () => this.update());
         }
         
         // we need to implement getTreeItem to receive items from our tree view
@@ -67,15 +69,47 @@ export namespace elv_tree
         public onItemClicked(item: NetWorkView) {
             // we implement this later
         }
-        
+
+        public async update() {
+            this.data = [];
+            let sn = this.fr.clientExecute(["space", "node", "list", "--config=/home/jan/ELV/elv-vscode/builds/RUN/config/qfab_cli.json"]);
+            if (sn === undefined){
+                return;
+            }
+            let j = String.fromCharCode(...sn.data);
+            console.log(`ret = ${j}`);
+            // let uris = nodes.fabricURIs as [string];
+            // this.data.push(new NetWorkView("FabricURIs"));
+            // uris.forEach(uri => {
+            //     this.data.at(-1)?.addChild(new NetWorkView(uri));
+            // });
+            // let ethers = this.elvData.Nodes().ethereumURIs as [string];
+            // this.data.push(new NetWorkView("EthereumURIs"));
+            // ethers.forEach(eth => {
+            //     this.data.at(-1)?.addChild(new NetWorkView(eth));
+            // });
+            // let searches = this.elvData.Nodes().searchURIs as [string];
+            // this.data.push(new NetWorkView("SearchURIs"));
+            // searches.forEach(search => {
+            //     this.data.at(-1)?.addChild(new NetWorkView(search));
+            // });
+            // let auths = this.elvData.Nodes().authServiceURIs as [string];
+            // this.data.push(new NetWorkView("AuthServiceURIs"));
+            // auths.forEach(auth => {
+            //     this.data.at(-1)?.addChild(new NetWorkView(auth));
+            // });
+            // this.mOnDidChangeTreeData.fire(undefined);
+       }
+
+
         // this is called whenever we refresh the tree view
         public async refresh() {
-                this.data = [];
-                if (this.elvData.configUrl === undefined){
-                    this.elvData = await ElvClient.FromConfigurationUrl({
-                        configUrl: "http://localhost:8008/config?qspace=dev&self"
-                      });
-                }
+                // this.data = [];
+                // if (this.elvData.configUrl === undefined){
+                //     this.elvData = await ElvClient.FromConfigurationUrl({
+                //         configUrl: "http://localhost:8008/config?qspace=dev&self"
+                //       });
+                // }
                 // let nodes = this.elvData.Nodes();
                 // let uris = nodes.fabricURIs as [string];
                 // this.data.push(new NetWorkView("FabricURIs"));
