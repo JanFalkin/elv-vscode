@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 var path = require('path');
 import { spawn, spawnSync, ChildProcessWithoutNullStreams } from 'child_process';
+import { kill } from 'process';
 var fs = require('fs');
 
 export class FabricRunner
@@ -18,8 +19,8 @@ export class FabricRunner
     elvmasterCfg:string;
 
 
-    // children represent branches, which are also items 
-    
+    // children represent branches, which are also items
+
     // add all members here, file and line we'll need later
     // the label represent the text which is displayed in the tree
     // and is passed to the base class
@@ -33,6 +34,11 @@ export class FabricRunner
         this.cfg = path.join(this.targetDir, "config-env.json");
         this.qfabCfg = path.join(this.targetDir, "RUN", "config", "qfab.json");
         this.elvmasterCfg = path.join(this.targetDir, "RUN", "config", "elvmasterd_dev_config.toml");
+    }
+    public finalize() {
+        console.log('Finalizing');
+        this.qfabProcess?.kill('SIGTERM');
+        this.elvMasterProcess?.kill('SIGTERM');
     }
 
 
@@ -73,11 +79,11 @@ export class FabricRunner
             console.error(`Command exited with code ${rets.status}`);
             return;
         }
-        let fields = ["space-owner", "space_owner_private_key", 
-        "user", "user_private_key", "kms_account", "kms_id", "kms_public_key", 
-        "kms_private_key", "qfab_node_account", "qfab_node_id", 
+        let fields = ["space-owner", "space_owner_private_key",
+        "user", "user_private_key", "kms_account", "kms_id", "kms_public_key",
+        "kms_private_key", "qfab_node_account", "qfab_node_id",
         "eth_url", "qfab_url", "network_id", "port", "rpcport", "elvport"];
-        
+
         var obj: { [key: string]: any } = {};
 
         var readme = "";
@@ -98,7 +104,7 @@ export class FabricRunner
         if (rets.stderr) {
           console.log(`stderr: ${rets.stderr}`);
         }
-      
+
         try {
           fs.writeFileSync("config-env.json", JSON.stringify(obj));
           fs.writeFileSync("DEVBUILD.out", readme);
@@ -118,6 +124,7 @@ export class FabricRunner
 
     public execute() {
         const env = {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             ELV_WALLET_PASSPHRASE: 'test',
           };
         this.elvMasterProcess = spawn(this.elvmaster, ["start", "dev", "--config",this.elvmasterCfg]);
@@ -138,5 +145,18 @@ export class FabricRunner
                 console.error(`stdout: ${data}`);
             });
         }
+        process.on('exit', () => {
+            console.log('Node.js has exited');
+            this.finalize();
+        });
+        process.on('SIGINT', () => {
+            console.log('Received SIGINT signal');
+            this.finalize();
+        });
+
+        process.on('SIGTERM', () => {
+            console.log('Received SIGTERM signal');
+            this.finalize();
+        });
     }
 }

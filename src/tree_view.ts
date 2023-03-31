@@ -39,7 +39,7 @@ export namespace elv_tree
             this.fr = fr;
 
             vscode.commands.registerCommand('debug_id.item_clicked', r => this.onItemClicked(r));
-            vscode.commands.registerCommand('debug_id.refresh', () => this.update());
+            vscode.commands.registerCommand('debug_id.refresh', () => this.refresh());
         }
         
         // we need to implement getTreeItem to receive items from our tree view
@@ -79,7 +79,7 @@ export namespace elv_tree
 
         // this is called whenever we refresh the tree view
         public async refresh() {
-            this.update();
+            await this.update();
         }
  
     }
