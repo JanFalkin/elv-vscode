@@ -16,15 +16,13 @@ var fabricRunner = new FabricRunner();
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
 	try{
-		//var nwv = new elv_tree.NodeNetworkView();
-		//vscode.window.registerTreeDataProvider('node_id', nwv);
-		//var localData = JSON.parse(rawData);
 		var lv = new elv_tree.NodeLocalView(fabricRunner);
+		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
 		vscode.commands.registerCommand('installFabric', installFabric);
 		//mock.runMock();
 		// note: we need to provide the same name here as we added in the package.json file
-		lv.refresh();
+		await lv.refresh();
 	}catch(e){
 		console.error(e);
 	}

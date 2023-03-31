@@ -17,11 +17,6 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "eluvio-node-container",
-          "title": "Eluvio Nodes",
-          "icon": "src/assets/eluvio.svg"
-        },
-        {
           "id": "eluvio-node-debugger",
           "title": "Local Eluvio Node",
           "icon": "src/assets/eluvio.svg"
@@ -29,12 +24,6 @@
       ]
     },
     "views": {
-      "eluvio-node-container": [
-        {
-          "id": "node_id",
-          "name": "node"
-        }
-      ],
       "eluvio-node-debugger": [
         {
           "id": "debug_id",
@@ -56,37 +45,20 @@
         }
       },
       {
-        "command": "node_id.item_clicked",
-        "title": "node view item"
-      },
-      {
         "command": "executeFabric",
         "title": "Execute content fabric"
       },
       {
         "command": "installFabric",
         "title": "Install content fabric"
-      },
-      {
-        "command": "node_id.refresh",
-        "title": "refresh",
-        "icon": {
-          "light": "src/assets/img_light/refresh.svg",
-          "dark": "src/assets/img_dark/refresh.svg"
-        }
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "node_id.refresh",
-          "when": "view == node_id",
-          "group": "navigation@0"
-        },
-        {
           "command": "debug_id.refresh",
           "when": "view == debug_id",
-          "group": "navigation@1"
+          "group": "navigation@0"
         }
       ]
     }
