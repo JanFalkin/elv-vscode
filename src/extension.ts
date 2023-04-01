@@ -20,6 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
 		vscode.commands.registerCommand('installFabric', installFabric);
+		vscode.commands.registerCommand('publishBitcode', publishBitcode);
 		//mock.runMock();
 		// note: we need to provide the same name here as we added in the package.json file
 		await lv.refresh();
@@ -38,6 +39,10 @@ async function executeFabric(){
 
 async function installFabric(){
 	fabricRunner.install(false);
+}
+
+async function publishBitcode(){
+	fabricRunner.publishBitcode("/home/jan/ELV/content-fabric/bitcode/wasm/objtar/objtar.wasm");
 }
 
 

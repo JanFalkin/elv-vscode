@@ -41,6 +41,16 @@ export class FabricRunner
         this.elvMasterProcess?.kill('SIGTERM');
     }
 
+    public async publishBitcode(wasmFilePath:string){
+      let client = this.clientExecute(["space", "bitcode", "/home/jan/ELV/content-fabric/bitcode/wasm/objtar/objtar.wasm", 
+                                   "--library", "ilib2nLKiR5p2yiGqCNicszxQYyvu9W4",  "--space", "ispc36s3uwY9voTx6gXcXENn4KfY29fC", 
+                                   "--config", "/home/jan/ELV/elv-vscode/builds/RUN/config/qfab_cli.json"]);
+       if (client !== undefined){
+        let s = String.fromCharCode(...client.data);
+        let j = JSON.parse(s);
+       }
+    }
+
 
     public async install(forceRegen:boolean){
         console.log("building mock fabric");
