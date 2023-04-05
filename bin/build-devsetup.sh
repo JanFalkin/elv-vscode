@@ -326,7 +326,7 @@ elvmasterd_init()
     fi
 }
 
-elvmasterd_start()
+    elvmasterd_start()
 {
     local ret
     echo ""
