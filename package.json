@@ -55,7 +55,14 @@
       {
         "command": "publishBitcode",
         "title": "Bitcode Publish",
-        "description": "Publish the wasm bitcode to the local content fabric"
+        "description": "Publish the wasm bitcode to the local content fabric",
+        "arguments": [
+          {
+            "name": "file",
+            "description": "the file path to a wasm file",
+            "type": "string"
+          }
+        ]
       }
     ],
     "menus": {

@@ -1,14 +1,6 @@
 {
   "dump_stack_on_exit": false,
   "paths": {
-    "install_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA",
-    "config_path": "/home/jan/ELV/RUNS/04-13-23/RUN/config",
-    "qparts_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/PARTS",
-    "qtemp_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/TEMP",
-    "qlibs_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/LIBS",
-    "node_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/LOCAL",
-    "cache_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/CACHE",
-    "search_index_path": "./RUN/QDATA/SEARCH"
   },
   "api": {
     "base_url": "http://localhost:8008",

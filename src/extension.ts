@@ -11,6 +11,10 @@ var path = require('path');
 const cp = require('child_process');
 var fabricRunner = new FabricRunner();
 
+interface PublishCommandArgs {
+	file: string;
+ }
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -41,8 +45,9 @@ async function installFabric(){
 	fabricRunner.install(false);
 }
 
-async function publishBitcode(){
-	fabricRunner.publishBitcode("/home/jan/ELV/content-fabric/bitcode/wasm/objtar/objtar.wasm");
+async function publishBitcode(args:  { command: string, arguments: PublishCommandArgs[] }){
+	const filename = args.arguments[0].file;
+	fabricRunner.publishBitcode(filename);
 }
 
 

@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 var path = require('path');
 import { spawn, spawnSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { kill } from 'process';
+import qfabBaseConfig from './dev-config.json';
+//const qfabBaseConfig = require('dev-config.json');
 var fs = require('fs');
 var tcpPortUsed = require('tcp-port-used');
 const { readFile } = require('fs/promises');
@@ -92,7 +94,6 @@ export class FabricRunner
       let res = spawnSync(this.qfabCli, ["space", "create","--config",cfg]);
       let se = String.fromCharCode(...res.stderr);
       let so = String.fromCharCode(...res.stdout);
-      console.log(`output = ${so}  err=  ${se}`);
 
       if (res.status === 0){
         console.log("space created");
@@ -102,27 +103,32 @@ export class FabricRunner
         let from = `"space_id": ""`;
         s = s.replace(from, rep);
         fs.writeFileSync(cfg, s);
+        return so;
       }else{
-        console.error("failed space created");
+        console.error(`failed space created stderr = ${se}, stdout = ${so}`);
       }
     }
 
     elvmasterdWalletCreate(cfg:string)
     {
       let res = spawnSync(this.elvmaster, ["wallet", "create", "dev", "--config",cfg]);
+      let se = String.fromCharCode(...res.stderr);
+      let so = String.fromCharCode(...res.stdout);
       if (res.status !== 0){
-        return false;
+        return "";
       }
-      return true;
+      return so;
     }
 
     elvmasterdInit(cfg:string)
     {
       let res = spawnSync(this.elvmaster, ["init", "dev", "--config",cfg]);
+      let se = String.fromCharCode(...res.stderr);
+      let so = String.fromCharCode(...res.stdout);
       if (res.status !== 0){
-        return false;
+        return "";
       }
-      return true;
+      return so;
     }
     
     elvmasterdDevConfig(emLog:string, emDir:string)
@@ -160,29 +166,44 @@ export class FabricRunner
       fs.chmodSync(cfgFileToWrite, '600');
     }
 
+    buildQfabConfig(){
+      try{
+        qfabBaseConfig["paths"] = this.obj["path"];
+        qfabBaseConfig["log"]["file"]["filename"] = this.obj["qfab_log_file"];
+        qfabBaseConfig["avpipe"]["cache"]["path"] = path.join(this.obj["path"]["install_path"], "pogreb.db");
+        qfabBaseConfig["fabric"]["node_id"] = this.obj["qfab_node_id"];
+        qfabBaseConfig["qspaces"][0]["id"] = this.obj["user_space_id"];
+        qfabBaseConfig["qspaces"][0]["ethereum"]["wallet_file"] = this.obj["wallet_file"];
+        fs.writeFileSync(this.obj["qfab_config_file"], JSON.stringify(qfabBaseConfig));
+      }catch(e){
+        console.error(`failed to generate ${this.obj["qfab_config_file"]}`);
+      }
+    }
+
 
     buildLocalFabric(){
       try{
-        let oldDir = process.cwd();
-        process.chdir(this.targetDir);
-        fs.mkdirSync("RUN");
-        process.chdir(this.runDir);
+//        let oldDir = process.cwd();
+//        process.chdir(this.targetDir);
+        fs.mkdirSync(this.runDir, { recursive: true });
         this.obj["qfab_dir"] = path.join(this.runDir, "QDATA");
-        fs.mkdirSync(this.obj["qfab_dir"]);
+        fs.mkdirSync(this.obj["qfab_dir"], { recursive: true });
         this.obj["elvmaster_dir"] = path.join(this.runDir, "elv-master");
 
-        fs.mkdirSync(this.obj["elvmaster_dir"]);
+        fs.mkdirSync(this.obj["elvmaster_dir"], { recursive: true });
         this.obj["elvmaster_keystore_dir"]=`${this.obj["elvmaster_dir"]}/keystore`;
         this.obj["node_wallet"]=`${this.obj["elvmaster_keystore_dir"]} + ${this.obj["qfab_node_account"]}`;
         this.obj["config_path"] = path.join(this.runDir, "config");
-        fs.mkdirSync(this.obj["config_path"]);
+        fs.mkdirSync(this.obj["config_path"], { recursive: true });
+        this.obj["path"] = {};
+        this.obj["path"]["install_path"]=`${this.obj["qfab_dir"]}`;
+        this.obj["path"]["qparts_path"]=`${this.obj["qfab_dir"]}/PARTS`;
+        this.obj["path"]["qtemp_path"]=`${this.obj["qfab_dir"]}/TEMP`;
+        this.obj["path"]["qlibs_path"]=`${this.obj["qfab_dir"]}/LIBS`;
+        this.obj["path"]["qnode_path"]=`${this.obj["qfab_dir"]}/LOCAL`;
+        this.obj["path"]["qcache_path"]=`${this.obj["qfab_dir"]}/CACHE`;
+        this.obj["path"]["qsearch_path"]=`${this.obj["qfab_dir"]}/SEARCH`;
 
-        this.obj["install_path"]=`${this.obj["qfab_dir"]}`;
-        this.obj["qparts_path"]=`${this.obj["qfab_dir"]}/PARTS`;
-        this.obj["qtemp_path"]=`${this.obj["qfab_dir"]}/TEMP`;
-        this.obj["qlibs_path"]=`${this.obj["qfab_dir"]}/LIBS`;
-        this.obj["qnode_path"]=`${this.obj["qfab_dir"]}/LOCAL`;
-        this.obj["qcache_path"]=`${this.obj["qfab_dir"]}/CACHE`;
         this.obj["elvmasterd_dev_config_file"]=`${this.obj["config_path"]}/elvmasterd_dev_config.toml`;
         this.obj["elvmasterd_log"]=`${this.runDir}/elvmasterd.log`;
         
@@ -197,34 +218,52 @@ export class FabricRunner
         let emTOML = this.elvmasterdDevConfig(this.obj["elvmasterd_log"], this.obj["elvmaster_dir"]);
         fs.writeFileSync(this.obj["elvmasterd_dev_config_file"], emTOML);
         fs.chmodSync(this.obj["elvmasterd_dev_config_file"], '600');
-        let f = this.elvmasterdWalletCreate(this.obj["elvmasterd_dev_config_file"]);
-        if (!f){
-          console.error("failed to create wallet");
-          return;
-        }
+        this.elvmasterdWalletCreate(this.obj["elvmasterd_dev_config_file"]);
+        // if (wallet === ""){
+        //   console.error("failed to create wallet");
+        //   return;
+        // }
         this.elvmasterdInit(this.obj["elvmasterd_dev_config_file"]);
+        const files = fs.readdirSync(this.obj["elvmaster_keystore_dir"]);
+        const fileNameSubstring = this.obj["qfab_node_account"]; // the substring you want to match
+
+        const wildcard = "*";
+        const matchingFiles = files.filter((file: string) => {
+            const filename = file;
+            return file.includes(fileNameSubstring);
+          });        
+        this.obj["wallet_file"] = path.join(this.obj["elvmaster_keystore_dir"], matchingFiles[0]);
         this.executeElvMaster();
         execSync('sleep 5');
 
         this.qfabCliConfig(this.obj["qfab_cli_space_owner_config_file"],  this.obj["space_owner_private_key"]);
         this.qfabCliConfig(this.obj["qfab_cli_user_config_file"],  this.obj["user_private_key"]);
         this.qfabCliConfig(this.obj["qfab_cli_kms_config_file"],  this.obj["kms_private_key"]);
+
+        function escapeIt(str:string | undefined) {
+          if (str  === undefined){
+            return;
+          }
+          return str.replace(/\n|\\|"/g, '');
+        }
         
-        this.obj["space_owner_private_key"] = this.qfabCliSpaceCreate(this.obj["qfab_cli_space_owner_config_file"]);
-        this.obj["user_private_key"] = this.qfabCliSpaceCreate(this.obj["qfab_cli_user_config_file"]);
-        this.obj["kms_private_key"] = this.qfabCliSpaceCreate(this.obj["qfab_cli_kms_config_file"]);
+        this.obj["space_owner_space_id"] = this.qfabCliSpaceCreate(this.obj["qfab_cli_space_owner_config_file"]);
+        this.obj["user_space_id"] = escapeIt(this.qfabCliSpaceCreate(this.obj["qfab_cli_user_config_file"]));
+        this.obj["kms_space_id"] = this.qfabCliSpaceCreate(this.obj["qfab_cli_kms_config_file"]);
 
         this.qfabCliKmsAdd(this.obj["kms_id"], this.obj["eth_url"],  this.obj["kms_public_key"], this.obj["qfab_cli_space_owner_config_file"]);
         this.qfabCliNodeAdd(this.obj["qfab_node_id"], this.obj["qfab_url"], this.obj["eth_url"], this.obj["qfab_cli_space_owner_config_file"],  this.obj["kms_id"]);
         
+        this.buildQfabConfig();
+        this.executeQfab();
         
 
         try {
-          fs.writeFileSync("config-env.json", JSON.stringify(this.obj));
+          fs.writeFileSync(this.cfg, JSON.stringify(this.obj));
         } catch (err) {
           console.error(err);
         }
-        process.chdir(oldDir);
+//        process.chdir(oldDir);
       }catch(e){
         console.error(e);
       }
@@ -279,7 +318,7 @@ export class FabricRunner
         this.obj["rpcport"]=8545;
         this.obj["elvport"]=6545;
         this.obj["qfabport"]=8008;
-        this.obj["peer_enc_block"]=`H4sIAAAAAAAA/6yUQY8rNwjHv4vPcwDbGDvHqodW6rUfADDeHTXJpMlE2tenfPcqL21W2tM87XID2z/4C8z3YMtxzC9h9z3Yq8zH33vYNSIEnMLrcvDL6tJ/2S/2V9jBFHw+IcFH/ze5vIZdgDf4pIX/iPQhQ3339ds/clzn6+E9ZPv576vfJZz8PC/98e602GvYIQDcblM4LkfzR41hCut8VyaH0zPib+tZfpVVvkRHxcLNUQFFUjXIJiRuTJxT7AijC2Af/bN5Pm9hCi9y+WM+zOsP5Zgw9h/hPo8x23W/fnschCkc5revbLUt81Hl4j/FC1OQ/X6xe7tjwdosotdUWZsRKFfQhuaAcYzCxRUI7ndV9vL/CEjn6mokVuIDeptCxpIko+aUTAeRUU0lcbGMfCdpzw7dt8G2DsBHGJIM7FyVquUnrfWIllyl8eCKCQoyOFVOiTBiVq+ZWqmbSlNFSA2QEhTPMTWrOY/M5lCIRmQtnLP4Jlhv3Rrfq6URqWYo0UZpzNSxgPcmSYda3gYbCkUtu0UFRKqYlbMXK9zFINdOjZOnTTBvrNXMRx6OKTG3FlNqHsdorDiYkCHS2AYb2UsioTEqxz6SUITecm/YrUSkJsVLlk2wwalmj0ARS+mluErFGnMaOamwUgJsibfA7ovtelA/P/fYi1z+vHh/+ic5+3H9ul97+zcAAP//HrSLxjIGAAA=`;
+        this.obj["peer_enc_block"]=`H4sIAAAAA26189c21e8387b9c50b780b91ce012ff676eb050AAA/6yUQY8rNwjHv4vPcwDbGDvHqodW6rUfADDeHTXJpMlE2tenfPcqL21W2tM87XID2z/4C8z3YMtxzC9h9z3Yq8zH33vYNSIEnMLrcvDL6tJ/2S/2V9jBFHw+IcFH/ze5vIZdgDf4pIX/iPQhQ3339ds/clzn6+E9ZPv576vfJZz8PC/98e602GvYIQDcblM4LkfzR41hCut8VyaH0zPib+tZfpVVvkRHxcLNUQFFUjXIJiRuTJxT7AijC2Af/bN5Pm9hCi9y+WM+zOsP5Zgw9h/hPo8x23W/fnschCkc5revbLUt81Hl4j/FC1OQ/X6xe7tjwdosotdUWZsRKFfQhuaAcYzCxRUI7ndV9vL/CEjn6mokVuIDeptCxpIko+aUTAeRUU0lcbGMfCdpzw7dt8G2DsBHGJIM7FyVquUnrfWIllyl8eCKCQoyOFVOiTBiVq+ZWqmbSlNFSA2QEhTPMTWrOY/M5lCIRmQtnLP4Jlhv3Rrfq6URqWYo0UZpzNSxgPcmSYda3gYbCkUtu0UFRKqYlbMXK9zFINdOjZOnTTBvrNXMRx6OKTG3FlNqHsdorDiYkCHS2AYb2UsioTEqxz6SUITecm/YrUSkJsVLlk2wwalmj0ARS+mluErFGnMaOamwUgJsibfA7ovtelA/P/fYi1z+vHh/+ic5+3H9ul97+zcAAP//HrSLxjIGAAA=`;
         this.obj["peer_port"]=40404;
         this.obj["peer_rpcport"]=8546;
         this.obj["peer_elvport"]=6546;
@@ -296,10 +335,10 @@ export class FabricRunner
         try{
             let td = fs.statSync(this.targetDir);
             if (td === undefined){
-                fs.mkdirSync(this.targetDir);
+                fs.mkdirSync(this.targetDir, { recursive: true });
             }
         }catch(e){
-            fs.mkdirSync(this.targetDir);
+            fs.mkdirSync(this.targetDir, { recursive: true });
         }
         try{
           let js = fs.statSync(this.cfg);
@@ -337,6 +376,15 @@ export class FabricRunner
 
     public executeElvMaster() {
       if (this.elvMasterProcess === undefined){
+          if (this.obj["elvmasterd_dev_config_file"] === undefined){
+            try{
+              this.obj = JSON.parse(fs.readFileSync(this.cfg));
+            }
+            catch(e){
+              console.error(`unable to parse json from ${this.cfg}`);
+              return;
+            }
+          }
           this.elvMasterProcess = spawn(this.elvmaster, ["start", "dev", "--config",this.obj["elvmasterd_dev_config_file"]]);
           if (this.elvMasterProcess !== undefined){
             this.elvMasterProcess.on('exit', (code) => {
@@ -358,7 +406,7 @@ export class FabricRunner
         // eslint-disable-next-line @typescript-eslint/naming-convention
         ELV_WALLET_PASSPHRASE: 'test',
       };
-      if (this.elvMasterProcess === undefined){
+      if (this.qfabProcess === undefined){
         this.qfabProcess = spawn(this.qfab, ["daemon", "--config", this.qfabCfg], { env });
         if (this.qfabProcess !== undefined){
             this.qfabProcess.on('exit', (code) => {
