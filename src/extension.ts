@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { elv_tree } from './tree_view';
 import { FabricRunner } from './fabric_runner';
+import { CommandsViewProvider } from './commandView';
 
 
 import { ElvClient } from '@eluvio/elv-client-js';
@@ -29,6 +30,19 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('decodeClipboard', decodeClipboard);
 		//mock.runMock();
 		// note: we need to provide the same name here as we added in the package.json file
+
+		const commandsViewProvider = new CommandsViewProvider();
+		vscode.window.registerTreeDataProvider('commandView', commandsViewProvider);
+
+		// Register the command to decode clipboard
+		const decodeClipboardCommand = vscode.commands.registerCommand('decodeClipboard', () => {
+			// Implement the logic to decode the clipboard contents
+			// You can use the vscode.env.clipboard.readText() method to read the clipboard contents
+			// and perform the decoding operation as needed
+		});
+
+		context.subscriptions.push(decodeClipboardCommand);
+
 		await lv.refresh();
 	} catch (e) {
 		console.error(e);

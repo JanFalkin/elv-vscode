@@ -20,6 +20,11 @@
           "id": "eluvio-node-debugger",
           "title": "Local Eluvio Node",
           "icon": "src/assets/eluvio.svg"
+        },
+        {
+          "id": "client-commands",
+          "title": "cli commands",
+          "icon": "src/assets/eluvio.svg"
         }
       ]
     },
@@ -28,6 +33,12 @@
         {
           "id": "debug_id",
           "name": "debugger"
+        }
+      ],
+      "client-commands": [
+        {
+          "id": "commandView",
+          "name": "Commands"
         }
       ]
     },

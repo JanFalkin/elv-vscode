@@ -1,13 +1,13 @@
 {
   "dump_stack_on_exit": false,
   "paths": {
-    "install_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA",
-    "config_path": "/home/jan/ELV/RUNS/04-13-23/RUN/config",
-    "qparts_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/PARTS",
-    "qtemp_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/TEMP",
-    "qlibs_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/LIBS",
-    "node_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/LOCAL",
-    "cache_path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/CACHE",
+    "install_path": "RUN/QDATA",
+    "config_path": "RUN/config",
+    "qparts_path": "RUN/QDATA/PARTS",
+    "qtemp_path": "RUN/QDATA/TEMP",
+    "qlibs_path": "RUN/QDATA/LIBS",
+    "node_path": "RUN/QDATA/LOCAL",
+    "cache_path": "RUN/QDATA/CACHE",
     "search_index_path": "./RUN/QDATA/SEARCH"
   },
   "api": {
@@ -38,7 +38,7 @@
     "level": "debug",
     "formatter": "text",
     "file": {
-      "filename": "/home/jan/ELV/RUNS/04-13-23/RUN/qfab.log",
+      "filename": "RUN/qfab.log",
       "maxsize": 10,
       "maxage": 0,
       "maxbackups": 2
@@ -64,7 +64,7 @@
     "persistent": "none",
     "debug_frame_level": false,
     "cache": {
-      "path": "/home/jan/ELV/RUNS/04-13-23/RUN/QDATA/pogreb.db",
+      "path": "RUN/QDATA/pogreb.db",
       "audio_page_segments": 2000,
       "video_page_segments": 1500,
       "manifests": 1000,
@@ -100,7 +100,7 @@
       "ethereum": {
         "url": "http://localhost:8545",
         "network_id": 955101,
-        "wallet_file": "/home/jan/ELV/RUNS/04-13-23/RUN/elv-master/keystore/UTC--2023-04-13T23-08-04.871928913Z--26189c21e8387b9c50b780b91ce012ff676eb050",
+        "wallet_file": "RUN/elv-master/keystore/UTC--2023-04-13T23-08-04.871928913Z--26189c21e8387b9c50b780b91ce012ff676eb050",
         "dao": {
           "enabled": true,
           "interval": "1s"

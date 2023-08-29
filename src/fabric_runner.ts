@@ -453,7 +453,7 @@ export class FabricRunner {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       ELV_WALLET_PASSPHRASE: 'test',
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      LD_LIBRARY_PATH: '/home/jan/ELV/elv-toolchain/dist/linux-glibc.2.31/../../FFmpeg/FFmpeg/dist/lib:/home/jan/ELV/deps/sqlite/.libs/:/home/jan/ELV/deps/libco/:/home/jan/ELV/deps/raft/.libs/:/home/jan/ELV/deps/dqlite/.libs//home/jan/ELV/deps/sqlite/.libs/:/home/jan/ELV/deps/libco/:/home/jan/ELV/deps/raft/.libs/:/home/jan/ELV/deps/dqlite/.libs/'
+      //LD_LIBRARY_PATH: '/home/jan/ELV/elv-toolchain/dist/linux-glibc.2.31/../../FFmpeg/FFmpeg/dist/lib:/home/jan/ELV/deps/sqlite/.libs/:/home/jan/ELV/deps/libco/:/home/jan/ELV/deps/raft/.libs/:/home/jan/ELV/deps/dqlite/.libs//home/jan/ELV/deps/sqlite/.libs/:/home/jan/ELV/deps/libco/:/home/jan/ELV/deps/raft/.libs/:/home/jan/ELV/deps/dqlite/.libs/'
     };
     if (this.qfabProcess === undefined) {
       this.qfabProcess = spawn(this.qfab, ["daemon", "--config", this.qfabCfg], { env });
