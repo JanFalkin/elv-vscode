@@ -3,46 +3,87 @@
 import * as vscode from 'vscode';
 import { elv_tree } from './tree_view';
 import { FabricRunner } from './fabric_runner';
+import { CommandsViewProvider } from './commandView';
 
 
-import {ElvClient} from '@eluvio/elv-client-js';
+import { ElvClient } from '@eluvio/elv-client-js';
 var fs = require('fs');
 var path = require('path');
 const cp = require('child_process');
 var fabricRunner = new FabricRunner();
 
+interface PublishCommandArgs {
+	file: string;
+}
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-	try{
+	try {
 		var lv = new elv_tree.NodeLocalView(fabricRunner);
 		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
 		vscode.commands.registerCommand('installFabric', installFabric);
 		vscode.commands.registerCommand('publishBitcode', publishBitcode);
+		vscode.commands.registerCommand('decodeToken', decodeToken);
+		vscode.commands.registerCommand('decodeClipboard', decodeClipboard);
 		//mock.runMock();
 		// note: we need to provide the same name here as we added in the package.json file
+
+		const commandsViewProvider = new CommandsViewProvider();
+		vscode.window.registerTreeDataProvider('commandView', commandsViewProvider);
+
+		// Register the command to decode clipboard
+		const decodeClipboardCommand = vscode.commands.registerCommand('decodeClipboard', () => {
+			// Implement the logic to decode the clipboard contents
+			// You can use the vscode.env.clipboard.readText() method to read the clipboard contents
+			// and perform the decoding operation as needed
+		});
+
+		context.subscriptions.push(decodeClipboardCommand);
+
 		await lv.refresh();
-	}catch(e){
+	} catch (e) {
 		console.error(e);
 	}
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
 
 
-async function executeFabric(){
+async function executeFabric() {
 	fabricRunner.execute();
 }
 
-async function installFabric(){
+async function installFabric() {
 	fabricRunner.install(false);
 }
 
-async function publishBitcode(){
-	fabricRunner.publishBitcode("/home/jan/ELV/content-fabric/bitcode/wasm/objtar/objtar.wasm");
+async function publishBitcode(args: { command: string, arguments: PublishCommandArgs[] }) {
+	const filename = args.arguments[0].file;
+	fabricRunner.publishBitcode(filename);
+}
+
+async function decodeToken() {
+	const activeEditor = vscode.window.activeTextEditor;
+	if (activeEditor) {
+		const selectedText = activeEditor.document.getText(activeEditor.selection);
+		// Use the selectedText as needed
+		console.log(selectedText);
+		let s = fabricRunner.decodeToken(selectedText);
+	}
+
+}
+
+async function decodeClipboard() {
+	const activeEditor = vscode.window.activeTextEditor;
+	const clipboardContents = vscode.env.clipboard.readText();
+	clipboardContents.then((text) => {
+		return fabricRunner.decodeToken(text);;
+	});
+
 }
 
 

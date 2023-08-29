@@ -1,15 +1,6 @@
 {
   "dump_stack_on_exit": false,
-  "paths": {
-    "install_path": "RUN/QDATA",
-    "config_path": "RUN/config",
-    "qparts_path": "RUN/QDATA/PARTS",
-    "qtemp_path": "RUN/QDATA/TEMP",
-    "qlibs_path": "RUN/QDATA/LIBS",
-    "node_path": "RUN/QDATA/LOCAL",
-    "cache_path": "RUN/QDATA/CACHE",
-    "search_index_path": "./RUN/QDATA/SEARCH"
-  },
+  "paths": {},
   "api": {
     "base_url": "http://localhost:8008",
     "auth_bypass": {

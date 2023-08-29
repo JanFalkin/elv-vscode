@@ -6,6 +6,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "bashdb",
+			"request": "launch",
+			"name": "devsetup.sh",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/bin/build-devsetup.sh",
+			"args": [
+				"/home/jan/ELV/elv-vscode/bin/elvmasterd",
+				"/home/jan/ELV/elv-vscode/bin/qfab",
+				"/home/jan/ELV/elv-vscode/bin/qfab_cli"
+			]
+		},
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",

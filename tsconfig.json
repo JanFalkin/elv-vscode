@@ -11,6 +11,8 @@
 		"strict": true,   /* enable all strict type-checking options */
 		"allowJs": true,
 		"checkJs": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */

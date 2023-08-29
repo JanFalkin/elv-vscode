@@ -20,6 +20,11 @@
           "id": "eluvio-node-debugger",
           "title": "Local Eluvio Node",
           "icon": "src/assets/eluvio.svg"
+        },
+        {
+          "id": "client-commands",
+          "title": "cli commands",
+          "icon": "src/assets/eluvio.svg"
         }
       ]
     },
@@ -28,6 +33,12 @@
         {
           "id": "debug_id",
           "name": "debugger"
+        }
+      ],
+      "client-commands": [
+        {
+          "id": "commandView",
+          "name": "Commands"
         }
       ]
     },
@@ -49,13 +60,44 @@
         "title": "Execute content fabric"
       },
       {
+        "command": "decodeClipboard",
+        "title": "Decode clipboard",
+        "description": "Decode token from clipboard",
+        "arguments": [
+          {
+            "name": "token",
+            "description": "token to decode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "command": "decodeToken",
+        "title": "Decode qfab Token",
+        "description": "Decode token from selection",
+        "arguments": [
+          {
+            "name": "token",
+            "description": "token to decode",
+            "type": "string"
+          }
+        ]
+      },
+      {
         "command": "installFabric",
         "title": "Install content   "
       },
       {
         "command": "publishBitcode",
         "title": "Bitcode Publish",
-        "description": "Publish the wasm bitcode to the local content fabric"
+        "description": "Publish the wasm bitcode to the local content fabric",
+        "arguments": [
+          {
+            "name": "file",
+            "description": "the file path to a wasm file",
+            "type": "string"
+          }
+        ]
       }
     ],
     "menus": {
@@ -68,10 +110,20 @@
       ],
       "explorer/context": [
         {
-            "command": "publishBitcode",
-            "when": "resourceScheme == 'file'"
+          "command": "publishBitcode",
+          "when": "resourceScheme == 'file'"
         }
-    ]
+      ],
+      "editor/context": [
+        {
+          "command": "decodeToken",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "decodeClipboard",
+          "when": "editorTextFocus"
+        }
+      ]
     }
   },
   "scripts": {
@@ -97,6 +149,7 @@
   },
   "dependencies": {
     "@eluvio/elv-client-js": "file:../elv-client-js",
+    "tcp-port-used": "^1.0.2",
     "xhr2": "^0.2.1"
   }
 }
