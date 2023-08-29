@@ -49,6 +49,30 @@
         "title": "Execute content fabric"
       },
       {
+        "command": "decodeClipboard",
+        "title": "Decode clipboard",
+        "description": "Decode token from clipboard",
+        "arguments": [
+          {
+            "name": "token",
+            "description": "token to decode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "command": "decodeToken",
+        "title": "Decode qfab Token",
+        "description": "Decode token from selection",
+        "arguments": [
+          {
+            "name": "token",
+            "description": "token to decode",
+            "type": "string"
+          }
+        ]
+      },
+      {
         "command": "installFabric",
         "title": "Install content   "
       },
@@ -77,6 +101,16 @@
         {
           "command": "publishBitcode",
           "when": "resourceScheme == 'file'"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "decodeToken",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "decodeClipboard",
+          "when": "editorTextFocus"
         }
       ]
     }
