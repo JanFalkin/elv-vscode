@@ -3,16 +3,23 @@ var path = require('path');
 import { spawn, spawnSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { kill } from 'process';
 import qfabBaseConfig from './dev-config.json';
+import { updateQfabStatus } from './extension';
 //const qfabBaseConfig = require('dev-config.json');
 var fs = require('fs');
 var tcpPortUsed = require('tcp-port-used');
 const { readFile } = require('fs/promises');
 const { execSync } = require('child_process');
+var finder = require('find-package-json');
 
 function content(path: string) {
   return fs.readFileSync(path);
 }
 
+export function getBaseDir() {
+  let d = __dirname + '/..';
+  var f = finder(d);
+  return path.dirname(f.next().value.__path);
+}
 class VersionedObject {
   public id!: string;
 
@@ -63,6 +70,8 @@ export class FabricRunner {
   runDir: string;
   obj: { [key: string]: any };
   fabric: LocalFabric;
+  ch?: vscode.OutputChannel;
+  context?: vscode.ExtensionContext;
 
 
   // children represent branches, which are also items
@@ -95,17 +104,26 @@ export class FabricRunner {
   }
 
   public async decodeToken(token: string) {
-    let ch = vscode.window.createOutputChannel('elv-vscode');
+    if (this.ch === undefined) {
+      this.ch = vscode.window.createOutputChannel('elv-vscode');
+    }
+
+    let basePath = getBaseDir();
+    let cfg = path.resolve(basePath, 'builds/RUN/config/qfab_cli.json');
     let client = this.clientExecute(["tools", "decode", token,
-      "--config", "builds/RUN/config/qfab_cli.json"]);
+      "--config", cfg]);
     if (client !== undefined && client.data[0] !== 10) {
       let s = String.fromCharCode(...client.data);
       console.log("SUCCESS token contents:", s);
-      ch.appendLine("elv tools decode");
-      ch.appendLine(s);
-      ch.show();
+      this.ch.appendLine("elv tools decode");
+      this.ch.appendLine(s);
+      this.ch.show();
       return s;
     }
+  }
+
+  public setContext(ctx: vscode.ExtensionContext) {
+    this.context = ctx;
   }
 
   public async publishBitcode(wasmFilePath: string) {
@@ -472,7 +490,13 @@ export class FabricRunner {
         console.log('Node.js has exited');
         this.qfabProcess?.kill('SIGTERM');
         this.qfabProcess = undefined;
+        if (this.context !== undefined) {
+          updateQfabStatus(this.context);
+        }
       });
+      if (this.context !== undefined) {
+        updateQfabStatus(this.context);
+      }
     }
   }
 

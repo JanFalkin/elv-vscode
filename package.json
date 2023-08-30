@@ -149,6 +149,7 @@
   },
   "dependencies": {
     "@eluvio/elv-client-js": "file:../elv-client-js",
+    "find-package-json": "^1.2.0",
     "tcp-port-used": "^1.0.2",
     "xhr2": "^0.2.1"
   }

@@ -2,25 +2,92 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { elv_tree } from './tree_view';
-import { FabricRunner } from './fabric_runner';
+import { FabricRunner, getBaseDir } from './fabric_runner';
 import { CommandsViewProvider } from './commandView';
+import * as child_process from 'child_process';
 
 
 import { ElvClient } from '@eluvio/elv-client-js';
 var fs = require('fs');
 var path = require('path');
-const cp = require('child_process');
 var fabricRunner = new FabricRunner();
 
 interface PublishCommandArgs {
 	file: string;
 }
 
+function checkQfabStatus(): Promise<boolean> {
+	return new Promise<boolean>((resolve, reject) => {
+		// Run a command to check if the qfab binary is running
+		child_process.exec('pgrep qfab', (error, stdout, stderr) => {
+			if (error) {
+				resolve(false); // qfab not running
+			} else {
+				resolve(true); // qfab running
+			}
+		});
+	});
+}
+
+const qfabStatusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+qfabStatusItem.text = 'qfab';
+qfabStatusItem.show();
+
+export function updateQfabStatus(ctx: vscode.ExtensionContext) {
+	checkQfabStatus().then((isRunning) => {
+		const circleIcon = isRunning ? "$(link)" : "$(circle-slash)";
+		const statusText = `${circleIcon} qfab`;
+
+		qfabStatusItem.text = statusText;
+		qfabStatusItem.tooltip = `qfab is ${isRunning ? 'running' : 'not running'}`;
+		qfabStatusItem.command = 'extension.qfabStatusClicked';
+
+		if (isRunning) {
+			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.foreground');
+		} else {
+			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');;
+		}
+	});
+}
+
+// Call updateQfabStatus whenever needed to update the status
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
 	try {
+		fabricRunner.setContext(context);
+		updateQfabStatus(context);
+		const isFirstRun = !context.globalState.get("extensionHasRun");
+		let basePath = getBaseDir();
+		let cfg = path.resolve(basePath, 'builds/RUN');
+
+		if (isFirstRun && !fs.existsSync(cfg)) {
+			// Run the installFabric command here
+			vscode.commands.executeCommand("installFabric");
+
+			// Set a flag to indicate that the extension has run before
+			context.globalState.update("extensionHasRun", true);
+		}
+		const rustDebuggerExtensionId = 'zerotaskx.rust-extension-pack';
+
+		// Check if the Rust Debugger extension is already installed
+		const rustDebuggerExtension = vscode.extensions.getExtension(rustDebuggerExtensionId);
+		if (!rustDebuggerExtension) {
+			try {
+				// Install the Rust Debugger extension
+				await vscode.commands.executeCommand('workbench.extensions.installExtension', rustDebuggerExtensionId);
+				// Activate the Rust Debugger extension
+				const rustDebuggerExtension = vscode.extensions.getExtension(rustDebuggerExtensionId);
+				if (rustDebuggerExtension !== undefined) {
+					await rustDebuggerExtension.activate();
+				}
+				// Use the Rust Debugger extension in your extension
+				// ...
+			} catch (error) {
+				console.error('Failed to install the Rust Debugger extension:', error);
+			}
+		}
 		var lv = new elv_tree.NodeLocalView(fabricRunner);
 		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
