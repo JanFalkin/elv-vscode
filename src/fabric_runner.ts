@@ -500,6 +500,16 @@ export class FabricRunner {
     }
   }
 
+  public stop() {
+    this.qfabProcess?.kill('SIGTERM');
+    this.elvMasterProcess?.kill('SIGTERM');
+    this.elvMasterProcess = undefined;
+    this.qfabProcess = undefined;
+    if (this.context !== undefined) {
+      updateQfabStatus(this.context);
+    }
+  }
+
   public execute() {
     this.executeElvMaster();
     this.executeQfab();

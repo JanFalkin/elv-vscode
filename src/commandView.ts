@@ -17,6 +17,18 @@ export class CommandsViewProvider implements vscode.TreeDataProvider<CommandItem
                 'decodeToken'
             ),
         ]),
+        new CommandCategory('QFAB', [
+            new CommandItem(
+                'Run Local Fabric',
+                'Runs a local copy of Eluvio content fabric',
+                'executeFabric'
+            ),
+            new CommandItem(
+                'Stop Local Fabric',
+                'Stops a local copy of Eluvio content fabric if running',
+                'stopFabric'
+            ),
+        ]),
         // Add more command items as needed
     ];
 

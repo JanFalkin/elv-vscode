@@ -91,6 +91,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		var lv = new elv_tree.NodeLocalView(fabricRunner);
 		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
+		vscode.commands.registerCommand('stopFabric', stopFabric);
 		vscode.commands.registerCommand('installFabric', installFabric);
 		vscode.commands.registerCommand('publishBitcode', publishBitcode);
 		vscode.commands.registerCommand('decodeToken', decodeToken);
@@ -122,6 +123,10 @@ export function deactivate() { }
 
 async function executeFabric() {
 	fabricRunner.execute();
+}
+
+async function stopFabric() {
+	fabricRunner.stop();
 }
 
 async function installFabric() {

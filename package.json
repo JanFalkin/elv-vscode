@@ -60,6 +60,10 @@
         "title": "Execute content fabric"
       },
       {
+        "command": "stopFabric",
+        "title": "Stop content fabric"
+      },
+      {
         "command": "decodeClipboard",
         "title": "Decode clipboard",
         "description": "Decode token from clipboard",
