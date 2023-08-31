@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { getBaseDir } from './fabric_runner';
+var path = require('path');
 
 export class CommandsViewProvider implements vscode.TreeDataProvider<CommandItem | CommandCategory>  {
     private _onDidChangeTreeData: vscode.EventEmitter<CommandItem | CommandCategory | undefined> = new vscode.EventEmitter<CommandItem | CommandCategory | undefined>();
@@ -67,10 +69,15 @@ class CommandItem extends vscode.TreeItem {
         public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None
     ) {
         super(label, collapsibleState);
+        this.command = {
+            command: commandId,
+            title: label
+        };
+        let d = getBaseDir();
+        this.iconPath = {
+            light: vscode.Uri.file(path.join(d, '/src/assets/img_light/play.svg')),
+            dark: vscode.Uri.file(path.join(d, 'src/assets/img_dark/play.svg'))
+        };
     }
-
-    command = {
-        command: this.commandId,
-        title: this.label
-    };
 }
+
