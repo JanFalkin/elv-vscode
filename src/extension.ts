@@ -33,24 +33,51 @@ const qfabStatusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignme
 qfabStatusItem.text = 'qfab';
 qfabStatusItem.show();
 
+let isFabricRunning = false;
+
 export function updateQfabStatus(ctx: vscode.ExtensionContext) {
 	checkQfabStatus().then((isRunning) => {
+		isFabricRunning = isRunning;
+
 		const circleIcon = isRunning ? "$(link)" : "$(circle-slash)";
 		const statusText = `${circleIcon} qfab`;
 
 		qfabStatusItem.text = statusText;
 		qfabStatusItem.tooltip = `qfab is ${isRunning ? 'running' : 'not running'}`;
-		qfabStatusItem.command = 'extension.qfabStatusClicked';
+		qfabStatusItem.command = 'toggleFabricStatus';
 
 		if (isRunning) {
-			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.foreground');
+			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
 		} else {
-			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');;
+			qfabStatusItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
 		}
 	});
 }
 
-// Call updateQfabStatus whenever needed to update the status
+async function toggleFabricStatus() {
+	let confirmMessage = '';
+	let action = '';
+	if (isFabricRunning) {
+		confirmMessage = 'Are you sure you want to stop the fabric?';
+		action = 'Stopping fabric...';
+	} else {
+		confirmMessage = 'Are you sure you want to start the fabric?';
+		action = 'Starting fabric...';
+	}
+	const userChoice = await vscode.window.showInformationMessage(confirmMessage, 'Yes', 'No');
+	if (userChoice === 'Yes') {
+		if (isFabricRunning) {
+			// Stop fabric logic here
+			vscode.window.showInformationMessage('Stopping fabric...');
+			stopFabric();
+		} else {
+			// Start fabric logic here
+			vscode.window.showInformationMessage('Starting fabric...');
+			executeFabric();
+		}
+	}
+}
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -92,6 +119,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const treeView = vscode.window.createTreeView('debug_id', { treeDataProvider: lv });
 		vscode.commands.registerCommand('executeFabric', executeFabric);
 		vscode.commands.registerCommand('stopFabric', stopFabric);
+		vscode.commands.registerCommand('toggleFabricStatus', toggleFabricStatus);
 		vscode.commands.registerCommand('installFabric', installFabric);
 		vscode.commands.registerCommand('publishBitcode', publishBitcode);
 		vscode.commands.registerCommand('decodeToken', decodeToken);

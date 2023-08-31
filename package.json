@@ -60,6 +60,10 @@
         "title": "Execute content fabric"
       },
       {
+        "command": "toggleFabricStatus",
+        "title": "Toggles fabric status"
+      },
+      {
         "command": "stopFabric",
         "title": "Stop content fabric"
       },
