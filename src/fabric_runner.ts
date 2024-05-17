@@ -4,6 +4,7 @@ import { spawn, spawnSync, ChildProcessWithoutNullStreams } from 'child_process'
 import { kill } from 'process';
 import qfabBaseConfig from './dev-config.json';
 import { updateQfabStatus } from './extension';
+import { CommandsViewProvider } from './commandView';
 //const qfabBaseConfig = require('dev-config.json');
 var fs = require('fs');
 var tcpPortUsed = require('tcp-port-used');
@@ -72,6 +73,7 @@ export class FabricRunner {
   fabric: LocalFabric;
   ch?: vscode.OutputChannel;
   context?: vscode.ExtensionContext;
+  cvp?: CommandsViewProvider;
 
 
   // children represent branches, which are also items
@@ -124,6 +126,10 @@ export class FabricRunner {
 
   public setContext(ctx: vscode.ExtensionContext) {
     this.context = ctx;
+  }
+
+  public setCommandViewProvider(cvp: CommandsViewProvider) {
+    this.cvp = cvp;
   }
 
   public async publishBitcode(wasmFilePath: string) {

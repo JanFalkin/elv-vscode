@@ -40,44 +40,75 @@ export class CommandsViewProvider implements vscode.TreeDataProvider<CommandItem
 
     getChildren(element?: CommandItem | CommandCategory): Thenable<(CommandItem | CommandCategory)[]> {
         if (element) {
-            if (element instanceof CommandCategory) {
-                return Promise.resolve(element.commandItems);
-            } else {
-                return Promise.resolve([]);
-            }
+            // Return command items for a specific category
+            const category = this.commandCategories.find((cat) => cat.label === element.label);
+            return Promise.resolve(category ? category.commandItems : []);
         } else {
+            // Return top-level categories
             return Promise.resolve(this.commandCategories);
         }
+    }
+    updateFabricState(isRunning: boolean) {
+        const runQfabCommand = this.commandCategories.find(category => category.label === "QFAB")?.commandItems.find(item => item.commandId === "executeFabric");
+        if (runQfabCommand) {
+            runQfabCommand.setEnabled(!isRunning);
+        }
+        const stopQfabCommand = this.commandCategories.find(category => category.label === "QFAB")?.commandItems.find(item => item.commandId === "stopFabric");
+        if (stopQfabCommand) {
+            stopQfabCommand.setEnabled(isRunning);
+        }
+        this.refresh();
+    }
+    refresh(): void {
+        this._onDidChangeTreeData.fire(undefined);
     }
 }
 
 class CommandCategory extends vscode.TreeItem {
     constructor(
         public readonly label: string,
-        public readonly commandItems: CommandItem[],
+        public readonly commandItems: CommandItem[] = [],
         public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.Collapsed
     ) {
         super(label, collapsibleState);
+        this.contextValue = 'commandCategory';
+    }
+    // Override the `onclick` event handler to prevent event propagation
+    public get onclick(): vscode.Command | undefined {
+        return {
+            command: '',
+            title: '',
+            tooltip: '',
+            arguments: []
+        };
     }
 }
 
 class CommandItem extends vscode.TreeItem {
+    private _enabled: boolean;
     constructor(
         public readonly label: string,
         public readonly description: string,
         public readonly commandId: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
+        public enabled?: boolean
     ) {
         super(label, collapsibleState);
         this.command = {
             command: commandId,
             title: label
         };
+        this._enabled = false;
+        this.contextValue = this._enabled ? 'commandEnabled' : 'commandDisabled';
         let d = getBaseDir();
         this.iconPath = {
             light: vscode.Uri.file(path.join(d, '/src/assets/img_light/play.svg')),
             dark: vscode.Uri.file(path.join(d, 'src/assets/img_dark/play.svg'))
         };
+    }
+    public setEnabled(enabled: boolean): void {
+        this._enabled = enabled;
+        this.contextValue = this._enabled ? 'commandEnabled' : 'commandDisabled';
     }
 }
 

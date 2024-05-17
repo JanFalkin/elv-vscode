@@ -39,6 +39,7 @@ export function updateQfabStatus(ctx: vscode.ExtensionContext) {
 	checkQfabStatus().then((isRunning) => {
 		isFabricRunning = isRunning;
 
+
 		const circleIcon = isRunning ? "$(link)" : "$(circle-slash)";
 		const statusText = `${circleIcon} qfab`;
 
@@ -123,11 +124,12 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('installFabric', installFabric);
 		vscode.commands.registerCommand('publishBitcode', publishBitcode);
 		vscode.commands.registerCommand('decodeToken', decodeToken);
-		vscode.commands.registerCommand('decodeClipboard', decodeClipboard);
 		//mock.runMock();
 		// note: we need to provide the same name here as we added in the package.json file
 
 		const commandsViewProvider = new CommandsViewProvider();
+		fabricRunner.setCommandViewProvider(commandsViewProvider);
+		commandsViewProvider.updateFabricState(false);
 		vscode.window.registerTreeDataProvider('commandView', commandsViewProvider);
 
 		// Register the command to decode clipboard
@@ -151,10 +153,12 @@ export function deactivate() { }
 
 async function executeFabric() {
 	fabricRunner.execute();
+	fabricRunner.cvp?.updateFabricState(true);
 }
 
 async function stopFabric() {
 	fabricRunner.stop();
+	fabricRunner.cvp?.updateFabricState(false);
 }
 
 async function installFabric() {

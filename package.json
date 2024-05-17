@@ -126,10 +126,6 @@
         {
           "command": "decodeToken",
           "when": "editorTextFocus"
-        },
-        {
-          "command": "decodeClipboard",
-          "when": "editorTextFocus"
         }
       ]
     }
