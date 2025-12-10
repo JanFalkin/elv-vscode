@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import {ElvClient} from '@eluvio/elv-client-js';
 import { FabricRunner } from './fabric_runner';
+var path = require('path');
 
 
 export namespace elv_tree
@@ -28,26 +29,26 @@ export namespace elv_tree
     {
         private data : NetWorkView [] = [];
         private fr:FabricRunner;
-   
+
         private mOnDidChangeTreeData: vscode.EventEmitter<NetWorkView | undefined> = new vscode.EventEmitter<NetWorkView | undefined>();
 
 
         readonly onDidChangeTreeData ? : vscode.Event<NetWorkView | undefined> = this.mOnDidChangeTreeData.event;
 
-        // we register two commands for vscode, item clicked (we'll implement later) and the refresh button. 
+        // we register two commands for vscode, item clicked (we'll implement later) and the refresh button.
         public constructor(fr:FabricRunner)  {
             this.fr = fr;
 
             vscode.commands.registerCommand('debug_id.item_clicked', r => this.onItemClicked(r));
             vscode.commands.registerCommand('debug_id.refresh', () => this.refresh());
         }
-        
+
         // we need to implement getTreeItem to receive items from our tree view
         public getTreeItem(element: NetWorkView): vscode.TreeItem|Thenable<vscode.TreeItem> {
             const item = new vscode.TreeItem(element.label!, element.collapsibleState);
             return item;
         }
-        
+
         // and getChildren
         public getChildren(element : NetWorkView | undefined): vscode.ProviderResult<NetWorkView[]> {
             if (element === undefined) {
@@ -56,7 +57,7 @@ export namespace elv_tree
                 return element.children;
             }
         }
-        
+
         // this is called when we click an item
         public onItemClicked(item: NetWorkView) {
             // we implement this later
@@ -64,7 +65,8 @@ export namespace elv_tree
 
         public async update() {
             this.data = [];
-            let sn = this.fr.clientExecute(["space", "node", "list", "--config=/home/jan/ELV/elv-vscode/builds/RUN/config/qfab_cli.json"]);
+            const qfabCliConfig = path.join(this.fr.runDir, "config", "qfab_cli.json");
+            let sn = this.fr.clientExecute(["space", "node", "list", `--config=${qfabCliConfig}`]);
             if (sn === undefined){
                 return;
             }
@@ -81,7 +83,7 @@ export namespace elv_tree
         public async refresh() {
             await this.update();
         }
- 
+
     }
-   
+
 }

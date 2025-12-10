@@ -101,5 +101,26 @@
   ],
   "gc": {
     "interval": "1m"
+  },
+  "blockchains": [
+    {
+      "chain_id": "eip155:955101",
+      "url": "http://localhost:8545"
+    }
+  ],
+  "services": {
+    "indexers": {
+      "eip155:955101": {
+        "enabled": true,
+        "ignore_fk_violation": true,
+        "ignore_model_errors": true,
+        "subscription": {
+          "finality": {
+            "max_block_age": "5s",
+            "min_newer_blocks": 10
+          }
+        }
+      }
+    }
   }
 }

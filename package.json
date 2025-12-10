@@ -3,6 +3,7 @@
   "displayName": "elv-vscode",
   "description": "eluvio content fabric development",
   "version": "0.0.1",
+  "publisher": "eluv-io",
   "engines": {
     "vscode": "^1.76.0"
   },
@@ -88,6 +89,41 @@
         "title": "Install content   "
       },
       {
+        "command": "elv-vscode.setGitHubToken",
+        "title": "Eluvio: Set GitHub Token",
+        "description": "Set GitHub Personal Access Token for downloading binaries"
+      },
+      {
+        "command": "elv-vscode.clearGitHubToken",
+        "title": "Eluvio: Clear GitHub Token",
+        "description": "Remove stored GitHub Personal Access Token"
+      },
+      {
+        "command": "elv-vscode.downloadBinaries",
+        "title": "Eluvio: Download Binaries",
+        "description": "Download Eluvio fabric binaries"
+      },
+      {
+        "command": "elv-vscode.reinstallFabric",
+        "title": "Eluvio: Reinstall Fabric",
+        "description": "Force reinstall/regenerate fabric configuration"
+      },
+      {
+        "command": "elv-vscode.startFabricBrowser",
+        "title": "Eluvio: Start Fabric Browser",
+        "description": "Start the Fabric Browser dev server"
+      },
+      {
+        "command": "elv-vscode.stopFabricBrowser",
+        "title": "Eluvio: Stop Fabric Browser",
+        "description": "Stop the Fabric Browser dev server"
+      },
+      {
+        "command": "elv-vscode.openFabricBrowser",
+        "title": "Eluvio: Open Fabric Browser",
+        "description": "Open the Fabric Browser in VS Code"
+      },
+      {
         "command": "publishBitcode",
         "title": "Bitcode Publish",
         "description": "Publish the wasm bitcode to the local content fabric",
@@ -126,6 +162,151 @@
       ]
     }
   },
+  "configuration": {
+    "title": "Eluvio Fabric",
+    "properties": {
+      "elv-vscode.fabric.autoStart": {
+        "type": "boolean",
+        "default": false,
+        "description": "Automatically start the local fabric when VS Code opens"
+      },
+      "elv-vscode.fabric.autoCloseOnExit": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically stop the fabric when VS Code closes"
+      },
+      "elv-vscode.fabric.networkId": {
+        "type": "number",
+        "default": 955101,
+        "description": "Network ID for the local fabric"
+      },
+      "elv-vscode.fabric.chainId": {
+        "type": "number",
+        "default": 955101,
+        "description": "Chain ID for the local fabric"
+      },
+      "elv-vscode.ports.elvmaster": {
+        "type": "number",
+        "default": 40403,
+        "description": "Port for elvmasterd"
+      },
+      "elv-vscode.ports.rpc": {
+        "type": "number",
+        "default": 8545,
+        "description": "RPC port for elvmasterd"
+      },
+      "elv-vscode.ports.elv": {
+        "type": "number",
+        "default": 6545,
+        "description": "ELV port for elvmasterd"
+      },
+      "elv-vscode.ports.qfab": {
+        "type": "number",
+        "default": 8008,
+        "description": "Port for qfab"
+      },
+      "elv-vscode.binaries.downloadUrl": {
+        "type": "string",
+        "default": "",
+        "markdownDescription": "Base URL for downloading fabric binaries from GitHub releases. Example: `https://github.com/eluv-io/fabric-binaries/releases/download`. Leave empty to specify path manually. Requires GitHub Personal Access Token for private repositories."
+      },
+      "elv-vscode.binaries.version": {
+        "type": "string",
+        "default": "latest",
+        "description": "Version of fabric binaries to download (e.g., 'v3.2.1' or 'latest')"
+      },
+      "elv-vscode.binaries.customPath": {
+        "type": "string",
+        "default": "",
+        "description": "Custom path to fabric binaries (overrides download)"
+      },
+      "elv-vscode.keys.spaceOwner": {
+        "type": "string",
+        "default": "0x81679e1b01aa38c04ca5aec757432d10fda01dfd",
+        "description": "Space owner Ethereum address"
+      },
+      "elv-vscode.keys.spaceOwnerPrivateKey": {
+        "type": "string",
+        "default": "b67bffcebaa19782243b27d8b940ee011cd4e432d40769f788f174fad53f870b",
+        "description": "Space owner private key (for dev use only)"
+      },
+      "elv-vscode.keys.user": {
+        "type": "string",
+        "default": "0xbb1039015306e4239c844f47ce0655f27b6744ae",
+        "description": "User Ethereum address"
+      },
+      "elv-vscode.keys.userPrivateKey": {
+        "type": "string",
+        "default": "8abeb47a19727df68d71c7eeb0ea603a25d622346d94f5acd2ea4f0796636906",
+        "description": "User private key (for dev use only)"
+      },
+      "elv-vscode.keys.kmsAccount": {
+        "type": "string",
+        "default": "0xd9dc97b58c5f2584062cf69775d160ed9a3bfbc4",
+        "description": "KMS account address"
+      },
+      "elv-vscode.keys.kmsId": {
+        "type": "string",
+        "default": "ikms433LwsH2LqfSvYtAFL7hnNWikLXd",
+        "description": "KMS ID"
+      },
+      "elv-vscode.keys.kmsPublicKey": {
+        "type": "string",
+        "default": "kepkscLtX6mfBHpQUsZCEDK8rZ3VN2wKBkPC4ucVXrBZQxg3",
+        "description": "KMS public key"
+      },
+      "elv-vscode.keys.kmsPrivateKey": {
+        "type": "string",
+        "default": "5a59693d04b5066d96bfe77a01ed0d719169c198d9243c4c0a4d9bc06329c1d8",
+        "description": "KMS private key (for dev use only)"
+      },
+      "elv-vscode.keys.qfabNodeAccount": {
+        "type": "string",
+        "default": "26189c21e8387b9c50b780b91ce012ff676eb050",
+        "description": "QFab node account"
+      },
+      "elv-vscode.keys.qfabNodeId": {
+        "type": "string",
+        "default": "inodXnRMo5b4svum81wHZtvpDq9DtUf",
+        "description": "QFab node ID"
+      },
+      "elv-vscode.keys.qfabNodePassphrase": {
+        "type": "string",
+        "default": "test",
+        "description": "QFab node passphrase"
+      },
+      "elv-vscode.browser.autoStart": {
+        "type": "boolean",
+        "default": false,
+        "description": "Automatically start the Fabric Browser when fabric starts"
+      },
+      "elv-vscode.browser.port": {
+        "type": "number",
+        "default": 8080,
+        "description": "Port for the Fabric Browser dev server"
+      },
+      "elv-vscode.browser.path": {
+        "type": "string",
+        "default": "",
+        "description": "Custom path to elv-fabric-browser installation (optional, uses node_modules by default)"
+      },
+      "elv-vscode.binaries.repository": {
+        "type": "string",
+        "default": "",
+        "markdownDescription": "GitHub repository for fabric binaries (format: `owner/repo`). Leave empty to skip automatic downloads."
+      },
+      "elv-vscode.binaries.version": {
+        "type": "string",
+        "default": "latest",
+        "description": "Version/tag of binaries to download (e.g., 'v3.2.1' or 'latest')"
+      },
+      "elv-vscode.binaries.autoUpdate": {
+        "type": "boolean",
+        "default": false,
+        "description": "Check for binary updates on startup"
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -148,7 +329,8 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@eluvio/elv-client-js": "file:../elv-client-js",
+    "@eluvio/elv-client-js": "^4.2.13",
+    "@eluvio/elv-fabric-browser": "github:eluv-io/elv-fabric-browser",
     "tcp-port-used": "^1.0.2",
     "xhr2": "^0.2.1"
   }
