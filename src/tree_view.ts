@@ -66,7 +66,7 @@ export namespace elv_tree
         public async update() {
             this.data = [];
             const qfabCliConfig = path.join(this.fr.runDir, "config", "qfab_cli.json");
-            let sn = this.fr.clientExecute(["space", "node", "list", `--config=${qfabCliConfig}`]);
+            let sn = this.fr.clientExecute(["space", "node", "list", "--config", qfabCliConfig]);
             if (sn === undefined){
                 return;
             }

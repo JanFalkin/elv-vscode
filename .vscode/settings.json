@@ -8,5 +8,8 @@
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    // Local paths to elv-fabric-browser and elv-core-js
+    "elv-vscode.browser.path": "/home/jan/src/elv-fabric-browser",
+    "elv-vscode.browser.coreJsPath": "/home/jan/src/elv-core-js"
 }

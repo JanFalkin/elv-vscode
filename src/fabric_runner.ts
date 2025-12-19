@@ -175,7 +175,7 @@ export class FabricRunner {
   //${qfab_node_id} ${qfab_url} ${eth_url} ${qfab_cli_space_owner_config_file} ${kms_id}
   qfabCliNodeAdd(qfabNodeId: string, qfabUrl: string, ethUrl: string, qfabCliSpaceOwnerConfigFile: string, kmsId: string) {
     const env = this.getExecutionEnvironment();
-    let res = spawnSync(this.qfabCli, ["space", "node", "add", qfabNodeId, "fab" + qfabUrl, "eth" + ethUrl, "--config", qfabCliSpaceOwnerConfigFile, "--kms", kmsId], { env });
+    let res = spawnSync(this.qfabCli, ["space", "node", "add", qfabNodeId, "fab+" + qfabUrl, "eth+" + ethUrl, "--config", qfabCliSpaceOwnerConfigFile, "--kms", kmsId], { env });
     let se = String.fromCharCode(...res.stderr);
     let so = String.fromCharCode(...res.stdout);
     if (res.status === 0) {
@@ -264,6 +264,7 @@ export class FabricRunner {
 log_file="${emLog}"
 datadir="${emDir}"
 nodekey=true
+rpcaddr="127.0.0.1"
 port=${this.obj["port"]}
 rpcport=${this.obj["rpcport"]}
 elvport=${this.obj["elvport"]}

@@ -58,7 +58,13 @@ This extension contributes the following settings:
 **Fabric Browser:**
 * `elv-vscode.browser.autoStart`: Automatically start the Fabric Browser when fabric starts (default: false)
 * `elv-vscode.browser.port`: Port for the Fabric Browser dev server (default: 8080)
-* `elv-vscode.browser.path`: Custom path to elv-fabric-browser installation (optional)
+* `elv-vscode.browser.path`: Custom path to elv-fabric-browser installation (optional, uses node_modules by default)
+* `elv-vscode.browser.coreJsPath`: Custom path to elv-core-js installation (optional, auto-detects sibling directory or uses node_modules)
+* `elv-vscode.browser.coreJsPort`: Port for the elv-core-js dev server (default: 8090)
+
+> **Development Tip:** If you're developing the extension and have local checkouts of `elv-fabric-browser` and `elv-core-js`, 
+> copy `.vscode/settings.local.json.example` to `.vscode/settings.local.json` and update the paths. 
+> This file is gitignored so your personal paths won't be committed.
 
 **Network Ports:**
 * `elv-vscode.ports.elvmaster`: Elvmaster daemon port (default: 40403)

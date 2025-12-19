@@ -124,6 +124,26 @@
         "description": "Open the Fabric Browser in VS Code"
       },
       {
+        "command": "elv-vscode.buildFabricBrowser",
+        "title": "Eluvio: Build Fabric Browser",
+        "description": "Build elv-core-js and elv-fabric-browser for deployment"
+      },
+      {
+        "command": "elv-vscode.startDeploymentServer",
+        "title": "Eluvio: Start Fabric Browser (Production)",
+        "description": "Start the production deployment server"
+      },
+      {
+        "command": "elv-vscode.stopDeploymentServer",
+        "title": "Eluvio: Stop Fabric Browser (Production)",
+        "description": "Stop the production deployment server"
+      },
+      {
+        "command": "elv-vscode.openDeploymentServer",
+        "title": "Eluvio: Open Fabric Browser (Production)",
+        "description": "Open the production Fabric Browser"
+      },
+      {
         "command": "publishBitcode",
         "title": "Bitcode Publish",
         "description": "Publish the wasm bitcode to the local content fabric",
@@ -205,16 +225,6 @@
         "default": 8008,
         "description": "Port for qfab"
       },
-      "elv-vscode.binaries.downloadUrl": {
-        "type": "string",
-        "default": "",
-        "markdownDescription": "Base URL for downloading fabric binaries from GitHub releases. Example: `https://github.com/eluv-io/fabric-binaries/releases/download`. Leave empty to specify path manually. Requires GitHub Personal Access Token for private repositories."
-      },
-      "elv-vscode.binaries.version": {
-        "type": "string",
-        "default": "latest",
-        "description": "Version of fabric binaries to download (e.g., 'v3.2.1' or 'latest')"
-      },
       "elv-vscode.binaries.customPath": {
         "type": "string",
         "default": "",
@@ -275,20 +285,35 @@
         "default": "test",
         "description": "QFab node passphrase"
       },
-      "elv-vscode.browser.autoStart": {
-        "type": "boolean",
-        "default": false,
-        "description": "Automatically start the Fabric Browser when fabric starts"
-      },
       "elv-vscode.browser.port": {
         "type": "number",
         "default": 8080,
         "description": "Port for the Fabric Browser dev server"
       },
+      "elv-vscode.browser.autoStart": {
+        "type": "boolean",
+        "default": false,
+        "description": "Automatically start Fabric Browser when local fabric starts"
+      },
       "elv-vscode.browser.path": {
         "type": "string",
         "default": "",
         "description": "Custom path to elv-fabric-browser installation (optional, uses node_modules by default)"
+      },
+      "elv-vscode.browser.coreJsPath": {
+        "type": "string",
+        "default": "",
+        "description": "Custom path to elv-core-js installation (optional, auto-detects sibling directory or uses node_modules)"
+      },
+      "elv-vscode.browser.coreJsPort": {
+        "type": "number",
+        "default": 8090,
+        "description": "Port for the elv-core-js dev server"
+      },
+      "elv-vscode.browser.useExternalBrowser": {
+        "type": "boolean",
+        "default": true,
+        "description": "Open Fabric Browser in external browser instead of VS Code's SimpleBrowser (required for CORS)"
       },
       "elv-vscode.binaries.repository": {
         "type": "string",
@@ -330,7 +355,8 @@
   },
   "dependencies": {
     "@eluvio/elv-client-js": "^4.2.13",
-    "@eluvio/elv-fabric-browser": "github:eluv-io/elv-fabric-browser",
+    "@eluvio/elv-core-js": "github:eluv-io/elv-core-js",
+    "express": "^4.18.2",
     "tcp-port-used": "^1.0.2",
     "xhr2": "^0.2.1"
   }

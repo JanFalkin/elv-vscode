@@ -8,6 +8,7 @@ import { BinaryManager } from './binaryManager';
 import { FabricStatusManager } from './fabricStatusManager';
 import { WorkspaceStateManager } from './workspaceStateManager';
 import { FabricBrowserManager } from './fabricBrowserManager';
+import { DeploymentServer } from './deploymentServer';
 import { ElvClient } from '@eluvio/elv-client-js';
 var fs = require('fs');
 var path = require('path');
@@ -16,6 +17,7 @@ var fabricRunner: FabricRunner;
 var statusManager: FabricStatusManager;
 var workspaceStateManager: WorkspaceStateManager;
 var browserManager: FabricBrowserManager;
+var deploymentServer: DeploymentServer;
 
 interface PublishCommandArgs {
 	file: string;
@@ -71,6 +73,28 @@ export async function activate(context: vscode.ExtensionContext) {
 		outputChannel.appendLine('[elv-vscode] Initializing status manager...');
 		console.log('[elv-vscode] Initializing status manager...');
 		statusManager = new FabricStatusManager(context, fabricRunner, workspaceStateManager, browserManager, binaryManager);
+
+		// Initialize deployment server
+		outputChannel.appendLine('[elv-vscode] Initializing deployment server...');
+		console.log('[elv-vscode] Initializing deployment server...');
+		deploymentServer = new DeploymentServer(context);
+
+		// Build Fabric Browser on first run (in background)
+		if (isFirstRun) {
+			outputChannel.appendLine('[elv-vscode] First run: scheduling Fabric Browser build...');
+			// Do this asynchronously so it doesn't block extension activation
+			setTimeout(async () => {
+				const buildNow = await vscode.window.showInformationMessage(
+					'Would you like to build the Fabric Browser now? This will take a few minutes but only needs to be done once.',
+					'Build Now',
+					'Build Later'
+				);
+				
+				if (buildNow === 'Build Now') {
+					await deploymentServer.build();
+				}
+			}, 2000); // Wait 2 seconds after activation
+		}
 
 		// Check if auto-start is enabled or if fabric was running last time
 		const config = vscode.workspace.getConfiguration('elv-vscode');
@@ -143,6 +167,25 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			vscode.commands.registerCommand('elv-vscode.openFabricBrowser', async () => {
 				await browserManager.open();
+			})
+		);
+
+		// Register Deployment Server commands (production build)
+		context.subscriptions.push(
+			vscode.commands.registerCommand('elv-vscode.buildFabricBrowser', async () => {
+				await deploymentServer.build();
+			}),
+
+			vscode.commands.registerCommand('elv-vscode.startDeploymentServer', async () => {
+				await deploymentServer.start();
+			}),
+
+			vscode.commands.registerCommand('elv-vscode.stopDeploymentServer', async () => {
+				await deploymentServer.stop();
+			}),
+
+			vscode.commands.registerCommand('elv-vscode.openDeploymentServer', async () => {
+				await deploymentServer.open();
 			})
 		);
 
